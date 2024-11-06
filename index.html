@@ -91,6 +91,21 @@
             align-items: center;
             cursor: pointer;
         }
+
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 5vmin;
+            z-index: 1000;
+        }
     </style>
     <script>
         let scoreA = 0;
@@ -106,6 +121,9 @@
         }
 
         async function addScore(team) {
+            const loader = document.getElementById('loader');
+            loader.style.display = 'flex';
+
             const urlParams = new URLSearchParams(window.location.search);
             const gameId = urlParams.get('gameid');
             try {
@@ -132,10 +150,17 @@
                 updateDisplay();
             } catch (error) {
                 console.error('There was a problem with the fetch operation:', error);
+            } finally {
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 300);
             }
         }
 
         async function undoAction() {
+            const loader = document.getElementById('loader');
+            loader.style.display = 'flex';
+
             const urlParams = new URLSearchParams(window.location.search);
             const gameId = urlParams.get('gameid');
             try {
@@ -160,6 +185,10 @@
                 updateDisplay();
             } catch (error) {
                 console.error('There was a problem with the fetch operation:', error);
+            } finally {
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 300);
             }
         }
 
@@ -197,6 +226,9 @@
 
         async function initializeGame(gameId) {
             try {
+                const loader = document.getElementById('loader');
+                loader.style.display = 'flex';
+
                 const response = await fetch(`https://www.django.taranms.ru/api/game/${gameId}/status/`, {
                     method: 'GET',
                     headers: {
@@ -213,14 +245,19 @@
                 scoreB = data.team_b_points;
 
                 updateSetsDisplay(data.sets_scores);
-
             } catch (error) {
                 console.error('There was a problem with the fetch operation:', error);
+            } finally {
+                setTimeout(() => {
+                    const loader = document.getElementById('loader');
+                    loader.style.display = 'none';
+                }, 300);
             }
         }
     </script>
 </head>
 <body>
+    <div id="loader">Само секунда...</div>
     <div id="watch-face">
         <!-- Красная зона для команды A -->
         <div id="teamA" class="quarter-circle" onclick="addScore('A')">
