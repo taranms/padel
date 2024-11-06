@@ -185,7 +185,15 @@
         // Function to update the display with current game status
         function updateDisplay() {
             // Update the game score, formatting 0 as 00
-            document.getElementById('blockA').innerText = `${scoreA === 0 ? '00' : scoreA}:${scoreB === 0 ? '00' : scoreB}`;
+            if (scoreA === 40 && scoreB === 41) {
+                scoreText = "--:AD";
+            } else if (scoreA === 41 && scoreB === 40) {
+                scoreText = "AD:--";
+            } else {
+                // Update the game score, formatting 0 as 00
+                scoreText = `${scoreA === 0 ? '00' : scoreA}:${scoreB === 0 ? '00' : scoreB}`;
+            }
+            document.getElementById('blockA').innerText = scoreText;
             const setsContainer = document.getElementById('blockB');
             setsContainer.innerHTML = '';
 
@@ -225,16 +233,16 @@
                 const cornerId = servingTeam + serverPosition;
                 switch (cornerId) {
                     case 'AR':
-                        document.getElementById('top-left').style.display = 'block';
-                        break;
-                    case 'AL':
                         document.getElementById('bottom-left').style.display = 'block';
                         break;
+                    case 'AL':
+                        document.getElementById('top-left').style.display = 'block';
+                        break;
                     case 'BR':
-                        document.getElementById('bottom-right').style.display = 'block';
+                        document.getElementById('top-right').style.display = 'block';
                         break;
                     case 'BL':
-                        document.getElementById('top-right').style.display = 'block';
+                        document.getElementById('bottom-right').style.display = 'block';
                         break;
                 }
             }
