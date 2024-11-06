@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Score</title>
+    <style>
+        /* Setting default styles for html and body to cover the entire screen */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: black; /* Background color for the whole canvas */
+        }
+        
+        /* Styling for red corner indicators positioned in each corner */
+        .corner {
+            position: fixed;
+            width: 40vh;
+            height: 40vh;
+            background-color: red;
+        }
+        
+        /* Positioning each corner indicator */
+        #top-left {
+            top: 0;
+            left: 0;
+        }
+        #top-right {
+            top: 0;
+            right: 0;
+        }
+        #bottom-left {
+            bottom: 0;
+            left: 0;
+        }
+        #bottom-right {
+            bottom: 0;
+            right: 0;
+        }
+        
+        /* Container for the scoreboard and set scores */
+        #container {
+            position: absolute;
+            top: 0;
+            left: 10%;
+            width: 80%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            align-items: center;
+            z-index: 1; /* Make sure the container is above the red corners */
+        }
+        
+        /* Upper block (Game Score) */
+        #blockA {
+            
+            width: 100%;
+            height: 50%;
+            background-color: #333333; /* Dark gray background for debugging */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 50vmin;
+            color: white;
+            text-align: center;
+        
+            font-weight: bold;
+        }
+        
+        /* Lower block (Set Scores) */
+        #blockB {
+            width: 100%;
+            height: 50%;
+            background-color: #000080; /* Dark blue background for debugging */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Set rows styling for two rows, five columns each */
+        .set-row {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            font-size: 10vmin;
+            color: white;
+            margin: 1vmin 0;
+        }
+        .set {
+            
+            font-size: 24vmin;
+            width: 15vmin;
+            text-align: center;
+        
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        // Variables for storing the game state
+        let scoreA = 0;
+        let scoreB = 0;
+        let setsScores = [];
+        let servingTeam = '';
+        let serverPosition = 'none';
+
+        // Prevent screen from going to sleep by periodically triggering a small action
+        function preventSleep() {
+            window.focus();
+            document.body.style.cursor = 'none';
+            setTimeout(() => {
+                document.body.style.cursor = 'default';
+            }, 100);
+        }
+
+
+        // Function to fetch game status from the API
+        async function fetchGameStatus() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const gameId = urlParams.get('gameid');
+            if (!gameId) {
+                alert('Game ID not provided');
+                return;
+            }
+
+            try {
+                // Fetching the game status data
+                const response = await fetch(`https://www.django.taranms.ru/api/game/${gameId}/status/`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                // Handle non-200 response
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                // Parsing the JSON data from the response
+                const data = await response.json();
+                scoreA = data.team_a_points;
+                scoreB = data.team_b_points;
+                setsScores = data.sets_scores;
+                servingTeam = data.serving_team;
+                serverPosition = data.server_position;
+                updateDisplay();
+            } catch (error) {
+                console.error('There was a problem with the fetch operation:', error);
+            }
+        }
+
+        // Function to update the display with current game status
+        function updateDisplay() {
+            // Update the game score, formatting 0 as 00
+            document.getElementById('blockA').innerText = `${scoreA === 0 ? '00' : scoreA}:${scoreB === 0 ? '00' : scoreB}`;
+            const setsContainer = document.getElementById('blockB');
+            setsContainer.innerHTML = '';
+
+            // Create top and bottom rows for the set scores
+            const topRow = document.createElement('div');
+            topRow.className = 'set-row';
+            const bottomRow = document.createElement('div');
+            bottomRow.className = 'set-row';
+
+            // Populate rows with set scores
+            for (let i = 0; i < 5; i++) {
+                // Assign scores or '-' if undefined
+                const topScore = setsScores[i] ? setsScores[i][0] : '-';
+                const bottomScore = setsScores[i] ? setsScores[i][1] : '-';
+
+                // Create div elements for top and bottom scores and append them to their respective rows
+                const topDiv = document.createElement('div');
+                topDiv.className = 'set';
+                topDiv.innerText = topScore;
+                topRow.appendChild(topDiv);
+
+                const bottomDiv = document.createElement('div');
+                bottomDiv.className = 'set';
+                bottomDiv.innerText = bottomScore;
+                bottomRow.appendChild(bottomDiv);
+            }
+
+            // Append rows to the sets container
+            setsContainer.appendChild(topRow);
+            setsContainer.appendChild(bottomRow);
+
+            // Hide all corner indicators initially
+            document.querySelectorAll('.corner').forEach(corner => corner.style.display = 'none');
+            
+            // Display the appropriate corner indicator based on serving team and position
+            if (servingTeam && serverPosition) {
+                const cornerId = servingTeam + serverPosition;
+                switch (cornerId) {
+                    case 'AR':
+                        document.getElementById('top-left').style.display = 'block';
+                        break;
+                    case 'AL':
+                        document.getElementById('bottom-left').style.display = 'block';
+                        break;
+                    case 'BR':
+                        document.getElementById('bottom-right').style.display = 'block';
+                        break;
+                    case 'BL':
+                        document.getElementById('top-right').style.display = 'block';
+                        break;
+                }
+            }
+        }
+
+        // On window load, fetch game status and update every second
+        window.addEventListener('load', () => {
+            fetchGameStatus();
+            setInterval(fetchGameStatus, 1000);
+            setInterval(preventSleep, 15000); // Prevent sleep every 15 seconds
+
+        });
+    </script>
+</head>
+<body>
+    <!-- Red corner indicators -->
+    <div id="top-left" class="corner"></div>
+    <div id="top-right" class="corner"></div>
+    <div id="bottom-left" class="corner"></div>
+    <div id="bottom-right" class="corner"></div>
+
+    <!-- Container for the score and sets -->
+    <div id="container">
+        <!-- Game score block -->
+        <div id="blockA">00:00</div>
+        <!-- Set scores block -->
+        <div id="blockB">
+            <div class="set-row">
+                <div class="set">0</div>
+                <div class="set">0</div>
+                <div class="set">0</div>
+                <div class="set">0</div>
+                <div class="set">0</div>
+            </div>
+            <div class="set-row">
+                <div class="set">0</div>
+                <div class="set">0</div>
+                <div class="set">0</div>
+                <div class="set">0</div>
+                <div class="set">0</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
