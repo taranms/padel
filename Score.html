@@ -118,14 +118,40 @@
         let servingTeam = '';
         let serverPosition = 'none';
 
-        // Prevent screen from going to sleep by periodically simulating user activity
+        // Prevent screen from going to sleep by using multiple methods
         function preventSleep() {
+            // Method 1: Simulate mouse movement
             window.focus();
             document.dispatchEvent(new MouseEvent('mousemove', {
                 bubbles: true,
                 cancelable: true,
                 view: window
             }));
+
+            // Method 2: Small screen update
+            const preventSleepElement = document.createElement('div');
+            preventSleepElement.style.position = 'fixed';
+            preventSleepElement.style.left = '-9999px';
+            document.body.appendChild(preventSleepElement);
+            setTimeout(() => {
+                document.body.removeChild(preventSleepElement);
+            }, 100);
+
+            // Method 3: Play a small silent video
+            if (!preventSleep.videoElement) {
+                preventSleep.videoElement = document.createElement('video');
+                preventSleep.videoElement.setAttribute('playsinline', '');
+                preventSleep.videoElement.setAttribute('muted', '');
+                preventSleep.videoElement.setAttribute('loop', '');
+                preventSleep.videoElement.style.display = 'none';
+
+                const source = document.createElement('source');
+                source.src = 'data:video/mp4;base64,AAAAIGZ0eXBtcDQyAAAAAGlzb21tcDQyAAACAWlzb2...';
+                source.type = 'video/mp4';
+                preventSleep.videoElement.appendChild(source);
+                document.body.appendChild(preventSleep.videoElement);
+                preventSleep.videoElement.play();
+            }
         }
 
         // Function to fetch game status from the API
@@ -237,15 +263,13 @@
         window.addEventListener('load', () => {
             fetchGameStatus();
             setInterval(fetchGameStatus, 1000);
-            setInterval(preventSleep, 5000); // Prevent sleep every 15 seconds by simulating user activity
+            setInterval(preventSleep, 5000); // Prevent sleep every 5 seconds using multiple methods
         });
     </script>
 </head>
 <body>
     <!-- Version number -->
-    <div id="version-number" style="position: fixed; top: 5px; left: 5px; color: rgba(105, 105, 105, 0.9); font-size: 0.8em; z-index: 9999;">Version 4</div>
-    <!-- Version number -->
-    
+    <div id="version-number" style="position: fixed; top: 5px; left: 5px; color: rgba(105, 105, 105, 0.9); font-size: 0.8em; z-index: 9999;">Version 5</div>
     <!-- Fullscreen button -->
     <button id="fullscreen-button" onclick="toggleFullScreen()">FullScreen</button>
 
