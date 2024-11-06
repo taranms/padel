@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Score</title>
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.9.0/NoSleep.min.js"></script>
+</head>
     <style>
         /* Setting default styles for html and body to cover the entire screen */
         html, body {
@@ -251,25 +254,43 @@
         // Function to toggle fullscreen mode
         function toggleFullScreen() {
             if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen();
+                document.documentElement.requestFullscreen().then(() => {
+                    enableNoSleep();
+                }).catch((err) => {
+                    console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                });
             } else {
                 if (document.exitFullscreen) {
-                    document.exitFullscreen();
+                    document.exitFullscreen().then(() => {
+                        disableNoSleep();
+                    }).catch((err) => {
+                        console.error(`Error attempting to disable full-screen mode: ${err.message} (${err.name})`);
+                    });
                 }
             }
         }
+        
 
         // On window load, fetch game status and update every second
         window.addEventListener('load', () => {
             fetchGameStatus();
             setInterval(fetchGameStatus, 1000);
-            setInterval(preventSleep, 5000); // Prevent sleep every 5 seconds using multiple methods
         });
-    </script>
-</head>
+
+        const noSleep = new NoSleep();
+
+        function enableNoSleep() {
+            noSleep.enable();
+        }
+
+        function disableNoSleep() {
+            noSleep.disable();
+        } 
+    
+</script>
 <body>
     <!-- Version number -->
-    <div id="version-number" style="position: fixed; top: 5px; left: 5px; color: rgba(105, 105, 105, 0.9); font-size: 0.8em; z-index: 9999;">Version 5</div>
+    <div id="version-number" style="position: fixed; top: 5px; left: 5px; color: rgba(105, 105, 105, 0.9); font-size: 0.8em; z-index: 9999;">Version 7</div>
     <!-- Fullscreen button -->
     <button id="fullscreen-button" onclick="toggleFullScreen()">FullScreen</button>
 
