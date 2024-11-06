@@ -188,7 +188,7 @@
 
         window.addEventListener('load', async () => {
             const urlParams = new URLSearchParams(window.location.search);
-            const gameId = urlParams.get('gameId');
+            const gameId = urlParams.get('gameid');
             if (gameId) {
                 await initializeGame(gameId);
             }
