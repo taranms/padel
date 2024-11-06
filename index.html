@@ -54,7 +54,7 @@
             background-color: green;
             top: 0;
             right: 0;
-            clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); /* Четверть круга в верхнем правом углу, чтобы избежать обрезания */
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); /* Четверть круга в верхнем правом углу, чтобы избежать обрезания */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -158,6 +158,10 @@
         }
 
         async function undoAction() {
+            if (!confirm('Вы уверены, что хотите отменить последнее действие?')) {
+                return;
+            }
+
             const loader = document.getElementById('loader');
             loader.style.display = 'flex';
 
@@ -245,6 +249,7 @@
                 scoreB = data.team_b_points;
 
                 updateSetsDisplay(data.sets_scores);
+                updateDisplay();
             } catch (error) {
                 console.error('There was a problem with the fetch operation:', error);
             } finally {
@@ -267,7 +272,7 @@
         <div id="teamB" class="quarter-circle" onclick="addScore('B')">
             <span id="teamBScore" style="transform: translateX(-25%);">0</span>        
         </div>
-        <!-- Центральная черная зона для отображения номеров сетов -->
+        <!-- Центральная черная она для отображения номеров сетов -->
         <div id="center-info">
             <div id="numbers-container" style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;">
                 <!-- Верхняя строка из 5 цифр -->
