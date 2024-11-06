@@ -118,23 +118,14 @@
         let servingTeam = '';
         let serverPosition = 'none';
 
-        // Prevent screen from going to sleep by playing a very small invisible video
-        let preventSleepVideo;
-
-        function initializePreventSleep() {
-            preventSleepVideo = document.createElement('video');
-            preventSleepVideo.setAttribute('playsinline', '');
-            preventSleepVideo.setAttribute('muted', '');
-            preventSleepVideo.setAttribute('loop', '');
-            preventSleepVideo.style.display = 'none';
-
-            const source = document.createElement('source');
-            source.src = 'data:video/mp4;base64,AAAAIGZ0eXBtcDQyAAAAAGlzb21tcDQyAAACAWlzb2...'; // A minimal base64 video to keep devices awake
-            source.type = 'video/mp4';
-            preventSleepVideo.appendChild(source);
-
-            document.body.appendChild(preventSleepVideo);
-            preventSleepVideo.play();
+        // Prevent screen from going to sleep by periodically simulating user activity
+        function preventSleep() {
+            window.focus();
+            document.dispatchEvent(new MouseEvent('mousemove', {
+                bubbles: true,
+                cancelable: true,
+                view: window
+            }));
         }
 
         // Function to fetch game status from the API
@@ -246,7 +237,7 @@
         window.addEventListener('load', () => {
             fetchGameStatus();
             setInterval(fetchGameStatus, 1000);
-            initializePreventSleep();
+            setInterval(preventSleep, 5000); // Prevent sleep every 15 seconds by simulating user activity
         });
     </script>
 </head>
