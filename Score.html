@@ -71,6 +71,12 @@
             text-align: center;
             font-weight: bold;
         }
+        #scoreLeft {        
+            color: #FF4D4D; 
+        }
+        #scoreRight {        
+            color: #4DFF4D; 
+        }
         
         /* Lower block (Set Scores) */
         #blockB {
@@ -98,6 +104,13 @@
             text-align: center;
             font-weight: bold;
         }
+
+        #taeamA-row {
+            color: #4DFF4D;
+        }
+        #taeamB-row {
+            color: #FF4D4D;
+        }
         
         /* Styling for fullscreen button */
         #fullscreen-button {
@@ -120,6 +133,8 @@
         let setsScores = [];
         let servingTeam = '';
         let serverPosition = 'none';
+        let domen = 'https://www.django.taranms.ru'
+        // let domen = 'https://0.0.0.0'
 
         let wakeLock = null;
 
@@ -157,7 +172,7 @@
 
             try {
                 // Fetching the game status data
-                const response = await fetch(`https://www.django.taranms.ru/api/game/${gameId}/status/`, {
+                const response = await fetch(`${domen}/api/game/${gameId}/status/`, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json'
@@ -176,6 +191,8 @@
                 setsScores = data.sets_scores;
                 servingTeam = data.serving_team;
                 serverPosition = data.server_position;
+                server_corner = data.server_corner;
+                reverse_side =  data.reverse_side;
                 updateDisplay();
             } catch (error) {
                 console.error('There was a problem with the fetch operation:', error);
@@ -186,22 +203,33 @@
         function updateDisplay() {
             // Update the game score, formatting 0 as 00
             if (scoreA === 40 && scoreB === 41) {
-                scoreText = "--:AD";
+                scoreLeftText = "--";
+                scoreRightText = "AD"
             } else if (scoreA === 41 && scoreB === 40) {
-                scoreText = "AD:--";
+                scoreLeftText = "AD";
+                scoreRightText = "--"
             } else {
                 // Update the game score, formatting 0 as 00
-                scoreText = `${scoreA === 0 ? '00' : scoreA}:${scoreB === 0 ? '00' : scoreB}`;
+                // scoreText = `${scoreA === 0 ? '00' : scoreA}:${scoreB === 0 ? '00' : scoreB}`;
+
+                scoreLeftText = `${scoreA === 0 ? '00' : scoreA}`;
+                scoreRightText = `${scoreB === 0 ? '00' : scoreB}`
             }
-            document.getElementById('blockA').innerText = scoreText;
+            // document.getElementById('blockA').innerText = scoreText;
+            document.getElementById('scoreLeft').innerText = reverse_side ? scoreRightText : scoreLeftText ;
+            document.getElementById('scoreRight').innerText = reverse_side ? scoreLeftText : scoreRightText;
+            document.getElementById('scoreLeft').style.color = reverse_side ?  "#FF4D4D" : "#4DFF4D" 
+            document.getElementById('scoreRight').style.color = reverse_side ? "#4DFF4D" : "#FF4D4D"
             const setsContainer = document.getElementById('blockB');
             setsContainer.innerHTML = '';
 
             // Create top and bottom rows for the set scores
             const topRow = document.createElement('div');
             topRow.className = 'set-row';
+            topRow.id = 'taeamA-row'
             const bottomRow = document.createElement('div');
             bottomRow.className = 'set-row';
+            bottomRow.id = 'taeamB-row'
 
             // Populate rows with set scores
             for (let i = 0; i < 5; i++) {
@@ -229,22 +257,28 @@
             document.querySelectorAll('.corner').forEach(corner => corner.style.display = 'none');
             
             // Display the appropriate corner indicator based on serving team and position
-            if (servingTeam && serverPosition) {
-                const cornerId = servingTeam + serverPosition;
+            console.log (`server_corner = ${server_corner}`)
+            if (server_corner) {
+                const cornerId = server_corner;
+                corner = null
                 switch (cornerId) {
-                    case 'AR':
-                        document.getElementById('bottom-left').style.display = 'block';
+                    case 'LB':
+                        corner = document.getElementById('bottom-left');
                         break;
-                    case 'AL':
-                        document.getElementById('top-left').style.display = 'block';
+                    case 'LT':
+                        corner = document.getElementById('top-left');
                         break;
-                    case 'BR':
-                        document.getElementById('top-right').style.display = 'block';
+                    case 'RT':
+                        corner = document.getElementById('top-right');
                         break;
-                    case 'BL':
-                        document.getElementById('bottom-right').style.display = 'block';
+                    case 'RB':
+                        corner = document.getElementById('bottom-right');
                         break;
                 }
+
+                corner.style.display = 'block';
+                cornerColor = servingTeam=='A' ? "#4DFF4D" : "#FF4D4D"
+                corner.style.backgroundColor = cornerColor
             }
         }
 
@@ -273,7 +307,7 @@
             fetchGameStatus();
             setInterval(fetchGameStatus, 1000);
             if ('wakeLock' in navigator) {
-                alert('Wake Lock API поддерживается');
+                console.log('Wake Lock API поддерживается');
             } else {
                 alert('Wake Lock API не поддерживается в этом браузере.');
             }
@@ -297,17 +331,17 @@
     <!-- Container for the score and sets -->
     <div id="container">
         <!-- Game score block -->
-        <div id="blockA">00:00</div>
+        <div id="blockA"><div id="scoreLeft">00</div>:<div id="scoreRight">00</div></div>
         <!-- Set scores block -->
         <div id="blockB">
-            <div class="set-row">
+            <div class="set-row" id="taeamA-row">
                 <div class="set">0</div>
                 <div class="set">0</div>
                 <div class="set">0</div>
                 <div class="set">0</div>
                 <div class="set">0</div>
             </div>
-            <div class="set-row">
+            <div class="set-row" id="taeamB-row">
                 <div class="set">0</div>
                 <div class="set">0</div>
                 <div class="set">0</div>
