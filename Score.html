@@ -144,6 +144,7 @@
         let servingTeam = '';
         let serverPosition = 'none';
         let domen = 'https://www.django.taranms.ru'
+        let lastScore = 'none'
         // let domen = 'https://0.0.0.0'
 
         let wakeLock = null;
@@ -209,6 +210,23 @@
             }
         }
 
+        function playSoundsSequentially(sounds) {
+          let currentIndex = 0;
+
+          // Создаем аудио-объект и воспроизводим первый звук
+          const audio = new Audio(sounds[currentIndex]);
+          audio.play();
+
+          // При завершении текущего звука воспроизводим следующий
+          audio.addEventListener('ended', function() {
+            currentIndex++;
+            if (currentIndex < sounds.length) {
+              audio.src = sounds[currentIndex];
+              audio.play();
+            }
+          });
+        }
+
         // Function to update the display with current game status
         function updateDisplay() {
             // Update the game score, formatting 0 as 00
@@ -230,6 +248,42 @@
             document.getElementById('scoreRight').innerText = reverse_side ? scoreLeftText : scoreRightText;
             document.getElementById('scoreLeft').style.color = reverse_side ?  "#FF4D4D" : "#4DFF4D" 
             document.getElementById('scoreRight').style.color = reverse_side ? "#4DFF4D" : "#FF4D4D"
+
+            if (lastScore != scoreLeftText + scoreRightText) {
+                lastScore = scoreLeftText + scoreRightText
+                sounds = []
+                if (scoreRightText == "40" && scoreLeftText == "40")
+                { 
+                    sounds = ['Equal.mp3'];                    
+                } 
+                else if ((servingTeam == 'A' && scoreLeftText == "Ad") || (servingTeam == 'B' && scoreRightText == "Ad"))
+
+                { 
+                    sounds = ['Ad.mp3'];                    
+                } 
+                else if ((servingTeam == 'A' && scoreRightText == "Ad") || (servingTeam == 'B' && scoreLeftText == "Ad"))
+
+                { 
+                    sounds = ['Low.mp3'];                    
+                } 
+                else
+                {                    
+                    firstVoice  = servingTeam == 'A' ? scoreLeftText+'.mp3' : scoreRightText+'.mp3';
+                    secondVoice = servingTeam == 'A' ? scoreRightText+'.mp3' : scoreLeftText+'.mp3';
+
+
+                    sounds = [
+                        firstVoice,
+                        secondVoice
+                        ];                    
+                }
+
+                playSoundsSequentially(sounds);
+
+            }
+
+
+
             const setsContainer = document.getElementById('blockB');
             setsContainer.innerHTML = '';
 
@@ -315,7 +369,7 @@
         // On window load, fetch game status and update every second
         window.addEventListener('load', () => {
             fetchGameStatus();
-            setInterval(fetchGameStatus, 200);
+            setInterval(fetchGameStatus, 500);
             if ('wakeLock' in navigator) {
                 console.log('Wake Lock API поддерживается');
             } else {
