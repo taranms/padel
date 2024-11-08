@@ -214,14 +214,14 @@
           let currentIndex = 0;
 
           // Создаем аудио-объект и воспроизводим первый звук
-          const audio = new Audio(sounds[currentIndex]);
+          const audio = new Audio('voices/chonishvili/'+sounds[currentIndex]);
           audio.play();
 
           // При завершении текущего звука воспроизводим следующий
           audio.addEventListener('ended', function() {
             currentIndex++;
             if (currentIndex < sounds.length) {
-              audio.src = sounds[currentIndex];
+              audio.src = 'voices/chonishvili/'+sounds[currentIndex];
               audio.play();
             }
           });
