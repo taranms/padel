@@ -113,14 +113,14 @@
     <script>
         let scoreA = 0;
         let scoreB = 0;
-        let setNumberA = 4;
-        let setNumberB = 5;
+        // let setNumberA = 4;
+        // let setNumberB = 5;
 
         function updateDisplay() {
             document.getElementById('teamAScore').innerText = scoreA;
             document.getElementById('teamBScore').innerText = scoreB;
-            document.getElementById('setNumberA').innerText = setNumberA;
-            document.getElementById('setNumberB').innerText = setNumberB;
+            // document.getElementById('setNumberA').innerText = setNumberA;
+            // document.getElementById('setNumberB').innerText = setNumberB;
         }
 
         async function addScore(team) {
@@ -281,6 +281,13 @@
             alert('Попытка прокрутки вниз');
         } else if (event.deltaY < 0) {
             alert('Попытка прокрутки вверх');
+        }
+    });
+    document.addEventListener('rotarydetent', function(event) {
+        if (event.detail.direction === 'CW') {
+            alert('Вращение по часовой стрелке');
+        } else if (event.detail.direction === 'CCW') {
+            alert('Вращение против часовой стрелки');
         }
     });
     
