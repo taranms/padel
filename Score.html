@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Score</title>
+        <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAACS0lEQVRYCe1XPUsjQRieiHAeBLTZ8iT5ARss9IrrUtgcwnXX5Wf4Iw6LFIIW/g3xR2iKI9vccUiCWhwknBEtjATiPpM8k3dmd50JuNrcwO68X/M+z/vOZMhWlDM+be9NHdOrqted04pMaCllgxNYkjAEJPj6Y5+xrzrfrdVMPpLQBAheFrBBnQskAhIVgsP31gSAuYoXBsDrSX2mpO9e3DOytMMofSYoFZL6Yn3cm62XNsbCxy4YAnQO9gcqOoioGlJ5oEmS6Lg4ji1ws3guHN3equPRyDVrfUVa80Ck3+2E9KEqVi3tkAGOTuR1wyLgLpQ6wTFXv1a1C5Xj8Q0JLGWsy2yBm8ztCghEPyL1cPbghubqbldcAt4OAJDVuwg4AzwHro+6C0g7Z28HGChJsCvNZlO1222GFM4vkfB2AGAEBIKUh8OharVahcBwyC34O5lYOvzmInqrSwigGLwHvB2YhZf3/k/g3TtgfoZ399/L2+i8zGvn2hrcga3+hcJjRvpPwtJTRybGBBcLwQR+1nbsLFNbBThiMnF2WEYLJrC+O9LJ3aozGZc0mDPgW1c/+aNDiiqEneSKYvIwzE2oBp/z/OXZoiUPYVlMgs9Av9GxOFw1LhQeOaAfbl5Kk1cOJlDrblvJNrs7Cg8HwKF/2/hHU9C8OITYk8BzwMpvnj6oL78aFpAkZTmkMt9/mFb4hSL9Ppkg46n+rtHhv8cf9Uxyvhzw6w8TBsoPlNBOcG3wLCpn4YsS0iwWieCsywcSHCstAjCUTUKCA+8Z8OnLxTnzg4cAAAAASUVORK5CYII=">
+
+
     
 <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.9.0/NoSleep.min.js"></script>
 </head>
@@ -61,8 +64,8 @@
         /* Upper block (Game Score) */
         #blockA {
             width: 100%;
-            height: 50%;
-            background-color: #333333; /* Dark gray background for debugging */
+            height: 60%;
+            background-color: #000000; 
             display: flex;
             justify-content: center;
             align-items: center;
@@ -70,6 +73,10 @@
             color: white;
             text-align: center;
             font-weight: bold;
+            border-color: #7e7c7a;
+            border-bottom-style: dashed;
+            border-left-style: dashed;
+            border-right-style: dashed;
         }
         #scoreLeft {        
             color: #FF4D4D; 
@@ -81,12 +88,15 @@
         /* Lower block (Set Scores) */
         #blockB {
             width: 100%;
-            height: 50%;
-            background-color: #000080; /* Dark blue background for debugging */
+            height: 40%;
+            background-color: #000000; /* Dark blue background for debugging */
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            border-color: #7e7c7a;
+            border-left-style: dashed;
+            border-right-style: dashed;
         }
         
         /* Set rows styling for two rows, five columns each */
@@ -96,7 +106,7 @@
             width: 100%;
             font-size: 10vmin;
             color: white;
-            margin: 1vmin 0;
+            margin: -3vmin 0;
         }
         .set {
             font-size: 24vmin;
@@ -204,9 +214,9 @@
             // Update the game score, formatting 0 as 00
             if (scoreA === 40 && scoreB === 41) {
                 scoreLeftText = "--";
-                scoreRightText = "AD"
+                scoreRightText = "Ad"
             } else if (scoreA === 41 && scoreB === 40) {
-                scoreLeftText = "AD";
+                scoreLeftText = "Ad";
                 scoreRightText = "--"
             } else {
                 // Update the game score, formatting 0 as 00
@@ -305,7 +315,7 @@
         // On window load, fetch game status and update every second
         window.addEventListener('load', () => {
             fetchGameStatus();
-            setInterval(fetchGameStatus, 1000);
+            setInterval(fetchGameStatus, 200);
             if ('wakeLock' in navigator) {
                 console.log('Wake Lock API поддерживается');
             } else {
